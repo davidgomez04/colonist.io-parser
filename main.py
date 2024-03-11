@@ -3,7 +3,7 @@ import pandas as pd
 from datetime import datetime
 from player import Player
 
-playerToParse = ['elninokr', 'rexy9880', 'khaldaddy', 'dris#2181', 'samrezk', 'adweeknd', 'Dave#6024']
+playerToParse = ['elninokr', 'rexy9880', 'khaldaddy', 'dris#2181', 'samrezk', 'adweeknd', 'Bandur9062']
 
 def create_excel_file(playerDataList):
     # Extract relevant information for the Excel file
@@ -24,6 +24,12 @@ def create_excel_file(playerDataList):
     df.to_excel(excel_file, index=False)
 
     print(f"Excel file '{excel_file}' created successfully.")
+
+def playedWithBots(players):
+    for player in players:
+        if player["username"] == "Bot":
+            return True
+    return False
 
 # def get_start_date(start_date):
 #     year = start_date.year
@@ -48,12 +54,13 @@ for p in playerToParse:
         start_time_seconds = start_time_ms / 1000
         start_date = datetime.fromtimestamp(start_time_seconds)
         # get_start_date(start_date)
-        for player in game["players"]:
-            if p == player["username"] and player["finished"]: 
-                totalPoints += player["points"]
-                gamesPlayed+=1
-                if player["rank"] == 1:
-                    totalWins += 1
+        if not playedWithBots(game["players"]) and game["finished"]:
+            for player in game["players"]:
+                if p == player["username"] and player["finished"]: 
+                    totalPoints += player["points"]
+                    gamesPlayed+=1
+                    if player["rank"] == 1:
+                        totalWins += 1
     playerData = Player(p, totalWins, gamesPlayed, totalPoints)
     playerDataList.append(playerData)
 
