@@ -7,6 +7,7 @@ from gspread_dataframe import set_with_dataframe
 from google.oauth2.service_account import Credentials
 
 playerToParse = ['elninokr', 'rexy9880', 'khaldaddy', 'dris#2181', 'samrezk', 'adweeknd', 'Bandur9062']
+playerMap = {'elninokr': 'Nino', 'rexy9880': 'Rex', 'khaldaddy': 'Khalid', 'dris#2181': 'Adrisse', 'samrezk': 'Sam', 'adweeknd': 'Adri', 'Bandur9062': 'David'}
 
 def upload_google_sheet(df):
     scopes = ['https://www.googleapis.com/auth/spreadsheets']
@@ -27,6 +28,7 @@ def create_data_frame(playerDataList):
         'Total Points': [player.total_points for player in playerDataList],
         'PPG': [round(player.total_points/player.games_played,2) for player in playerDataList]
     }
+
     df = pd.DataFrame(data)
     return df
 
@@ -67,7 +69,7 @@ def parseData():
                         gamesPlayed+=1
                         if player["rank"] == 1:
                             totalWins += 1
-        playerData = Player(p, totalWins, gamesPlayed, totalPoints)
+        playerData = Player(playerMap[p], totalWins, gamesPlayed, totalPoints)
         playerDataList.append(playerData)
     return playerDataList
 
