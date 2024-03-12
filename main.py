@@ -107,9 +107,10 @@ def parseData():
         playerDataList.append(playerData)
     return playerDataList
 
+current_month = datetime.now().month
 data = parseData()
 df = create_data_frame(data)
-upload_google_sheet(df, 3)
+upload_google_sheet(df, current_month)
 
 
 
