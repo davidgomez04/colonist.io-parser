@@ -24,13 +24,29 @@ def create_data_frame(playerDataList):
         'Username': [player.username for player in playerDataList],
         'Games Played': [player.games_played for player in playerDataList],
         'Wins': [player.total_wins for player in playerDataList],
-        'Win %': [round(player.total_wins/player.games_played,2)*100 for player in playerDataList],
+        'Win %': [],
         'Total Points': [player.total_points for player in playerDataList],
-        'PPG': [round(player.total_points/player.games_played,2) for player in playerDataList]
+        'PPG': []
     }
 
+    for player in playerDataList:
+        try:
+            win_percentage = round(player.total_wins / player.games_played, 2) * 100
+        except ZeroDivisionError:
+            win_percentage = 0
+
+        try:
+            ppg = round(player.total_points / player.games_played, 2)
+        except ZeroDivisionError:
+
+            ppg = 0
+
+        data['Win %'].append(win_percentage)
+        data['PPG'].append(ppg)
+
     df = pd.DataFrame(data)
-    return df
+    sorted_df = df.sort_values(by='Win %', ascending=False)
+    return sorted_df
 
 def playedWithBots(players):
     for player in players:
@@ -61,14 +77,14 @@ def parseData():
             start_time_ms = int(game["startTime"])
             start_time_seconds = start_time_ms / 1000
             start_date = datetime.fromtimestamp(start_time_seconds)
-            # get_start_date(start_date)
-            if not playedWithBots(game["players"]) and game["finished"]:
-                for player in game["players"]:
-                    if p == player["username"] and player["finished"]: 
-                        totalPoints += player["points"]
-                        gamesPlayed+=1
-                        if player["rank"] == 1:
-                            totalWins += 1
+            if start_date.month == 3:
+                if not playedWithBots(game["players"]) and game["finished"]:
+                    for player in game["players"]:
+                        if p == player["username"] and player["finished"]: 
+                            totalPoints += player["points"]
+                            gamesPlayed+=1
+                            if player["rank"] == 1:
+                                totalWins += 1
         playerData = Player(playerMap[p], totalWins, gamesPlayed, totalPoints)
         playerDataList.append(playerData)
     return playerDataList
