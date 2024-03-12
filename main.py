@@ -6,17 +6,35 @@ import gspread
 from gspread_dataframe import set_with_dataframe
 from google.oauth2.service_account import Credentials
 
-playerToParse = ['rexy9880', 'khaldaddy', 'drissy', 'samrezk', 'adweeknd', 'Bandur9062', 'CalicoNino']
-playerMap = {'rexy9880': 'Rex', 'khaldaddy': 'Khalid', 'drissy': 'Adrisse', 'samrezk': 'Sam', 'adweeknd': 'Adri', 'Bandur9062': 'David', 'CalicoNino': 'Nino'}
+playerToParse = ['rexy9880', 'khaldaddy', 'drissy', 'samrezk', 'adweeknd', 'Bandur9062', 'CalicoNino', 'elninokr']
+playerMap = {'rexy9880': 'Rex', 'khaldaddy': 'Khalid', 'drissy': 'Adrisse', 'samrezk': 'Sam', 'adweeknd': 'Adri', 'Bandur9062': 'David', 'CalicoNino': 'Nino', 'elninokr': 'Nino 2'}
+number_to_month = {
+    1: 'Jan',
+    2: 'Feb',
+    3: 'Mar',
+    4: 'Apr',
+    5: 'May',
+    6: 'Jun',
+    7: 'Jul',
+    8: 'Aug',
+    9: 'Sep',
+    10: 'Oct',
+    11: 'Nov',
+    12: 'Dec'
+}
 
-def upload_google_sheet(df):
+def upload_google_sheet(df, month):
     scopes = ['https://www.googleapis.com/auth/spreadsheets']
     spreadsheet_id = "1--WcMX3CHI2jZnWiAgrT-ICmsQFjmcskR5tS-vYQU98"
     credentials = Credentials.from_service_account_file('key.json', scopes=scopes)
     gc = gspread.authorize(credentials)
     gs = gc.open_by_key(spreadsheet_id)
-    worksheet1 = gs.worksheet('Testing March - Catan')
-    set_with_dataframe(worksheet=worksheet1, dataframe=df, include_index=False, include_column_header=True)
+    try:
+        worksheet = gs.worksheet('Testing {} - Catan'.format(number_to_month[month]))
+    except:
+        worksheet = gs.add_worksheet(title="Testing {} - Catan".format(number_to_month[month]), rows=100, cols=20)
+        
+    set_with_dataframe(worksheet=worksheet, dataframe=df, include_index=False, include_column_header=True)
     print("Uploaded google sheets...")
 
 def create_data_frame(playerDataList):
@@ -91,7 +109,7 @@ def parseData():
 
 data = parseData()
 df = create_data_frame(data)
-upload_google_sheet(df)
+upload_google_sheet(df, 3)
 
 
 
