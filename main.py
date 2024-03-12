@@ -6,8 +6,8 @@ import gspread
 from gspread_dataframe import set_with_dataframe
 from google.oauth2.service_account import Credentials
 
-playerToParse = ['elninokr', 'rexy9880', 'khaldaddy', 'dris#2181', 'samrezk', 'adweeknd', 'Bandur9062']
-playerMap = {'elninokr': 'Nino', 'rexy9880': 'Rex', 'khaldaddy': 'Khalid', 'dris#2181': 'Adrisse', 'samrezk': 'Sam', 'adweeknd': 'Adri', 'Bandur9062': 'David'}
+playerToParse = ['rexy9880', 'khaldaddy', 'drissy', 'samrezk', 'adweeknd', 'Bandur9062', 'CalicoNino']
+playerMap = {'rexy9880': 'Rex', 'khaldaddy': 'Khalid', 'drissy': 'Adrisse', 'samrezk': 'Sam', 'adweeknd': 'Adri', 'Bandur9062': 'David', 'CalicoNino': 'Nino'}
 
 def upload_google_sheet(df):
     scopes = ['https://www.googleapis.com/auth/spreadsheets']
@@ -15,7 +15,7 @@ def upload_google_sheet(df):
     credentials = Credentials.from_service_account_file('key.json', scopes=scopes)
     gc = gspread.authorize(credentials)
     gs = gc.open_by_key(spreadsheet_id)
-    worksheet1 = gs.worksheet('Testing')
+    worksheet1 = gs.worksheet('Testing March - Catan')
     set_with_dataframe(worksheet=worksheet1, dataframe=df, include_index=False, include_column_header=True)
     print("Uploaded google sheets...")
 
