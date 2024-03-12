@@ -78,7 +78,7 @@ def parseData():
             start_time_seconds = start_time_ms / 1000
             start_date = datetime.fromtimestamp(start_time_seconds)
             if start_date.month == 3:
-                if not playedWithBots(game["players"]) and game["finished"]:
+                if not playedWithBots(game["players"]) and game["finished"] and game["setting"]["privateGame"]:
                     for player in game["players"]:
                         if p == player["username"] and player["finished"]: 
                             totalPoints += player["points"]
