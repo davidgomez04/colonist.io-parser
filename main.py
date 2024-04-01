@@ -6,8 +6,8 @@ import gspread
 from gspread_dataframe import set_with_dataframe
 from google.oauth2.service_account import Credentials
 
-playerToParse = ['rexy9880', 'khaldaddy', 'drissy', 'samrezk', 'adweeknd', 'Bandur9062', 'CalicoNino', 'elninokr']
-playerMap = {'rexy9880': 'Rex', 'khaldaddy': 'Khalid', 'drissy': 'Adrisse', 'samrezk': 'Sam', 'adweeknd': 'Adri', 'Bandur9062': 'David', 'CalicoNino': 'Nino', 'elninokr': 'Nino 2'}
+playerToParse = ['rexy9880', 'khaldaddy', 'drissy', 'samrezk', 'adweeknd', 'Bandur9062', 'CalicoNino', 'elninokr', 'Shult#6025']
+playerMap = {'Shult#6025': 'Zo', 'rexy9880': 'Rex', 'khaldaddy': 'Khalid', 'drissy': 'Adrisse', 'samrezk': 'Sam', 'adweeknd': 'Adri', 'Bandur9062': 'David', 'CalicoNino': 'Nino', 'elninokr': 'Nino 2'}
 number_to_month = {
     1: 'Jan',
     2: 'Feb',
@@ -30,9 +30,9 @@ def upload_google_sheet(df, month):
     gc = gspread.authorize(credentials)
     gs = gc.open_by_key(spreadsheet_id)
     try:
-        worksheet = gs.worksheet('Testing {} - Catan'.format(number_to_month[month]))
+        worksheet = gs.worksheet('{} - Catan'.format(number_to_month[month]))
     except:
-        worksheet = gs.add_worksheet(title="Testing {} - Catan".format(number_to_month[month]), rows=100, cols=20)
+        worksheet = gs.add_worksheet(title="{} - Catan".format(number_to_month[month]), rows=100, cols=20)
         
     set_with_dataframe(worksheet=worksheet, dataframe=df, include_index=False, include_column_header=True)
     print("Uploaded google sheets...")
@@ -64,6 +64,7 @@ def create_data_frame(playerDataList):
 
     df = pd.DataFrame(data)
     sorted_df = df.sort_values(by='Win %', ascending=False)
+    sorted_df = df.sort_values(by='PPG', ascending=False)
     return sorted_df
 
 def playedWithBots(players):
@@ -71,12 +72,6 @@ def playedWithBots(players):
         if player["username"] == "Bot":
             return True
     return False
-
-# def get_start_date(start_date):
-#     year = start_date.year
-#     month = start_date.month
-#     day = start_date.day
-#     return year + "-" + month + "-" + day
 
 def parseData():
     playerDataList = []
@@ -95,7 +90,7 @@ def parseData():
             start_time_ms = int(game["startTime"])
             start_time_seconds = start_time_ms / 1000
             start_date = datetime.fromtimestamp(start_time_seconds)
-            if start_date.month == 3:
+            if start_date.month == current_month:
                 if not playedWithBots(game["players"]) and game["finished"] and game["setting"]["privateGame"]:
                     for player in game["players"]:
                         if p == player["username"] and player["finished"]: 
