@@ -6,8 +6,6 @@ import gspread
 from gspread_dataframe import set_with_dataframe
 from google.oauth2.service_account import Credentials
 
-playerToParse = ['rexy9880', 'khaldaddy', 'drissy', 'samrezk', 'adweeknd', 'Bandur9062', 'CalicoNino', 'elninokr', 'Shult#6025']
-playerMap = {'Shult#6025': 'Zo', 'rexy9880': 'Rex', 'khaldaddy': 'Khalid', 'drissy': 'Adrisse', 'samrezk': 'Sam', 'adweeknd': 'Adri', 'Bandur9062': 'David', 'CalicoNino': 'Nino', 'elninokr': 'Nino 2'}
 number_to_month = {
     1: 'Jan',
     2: 'Feb',
@@ -22,6 +20,16 @@ number_to_month = {
     11: 'Nov',
     12: 'Dec'
 }
+
+def generatePlayerMap():
+    playerMap = {}
+    f = open('players.txt')
+    lines = f.readlines()
+    for line in lines:
+        username = line.split(",")[0].strip()
+        name = line.split(",")[1].strip()
+        playerMap[username] = name
+    return playerMap
 
 def upload_google_sheet(df, month):
     scopes = ['https://www.googleapis.com/auth/spreadsheets']
@@ -75,7 +83,8 @@ def playedWithBots(players):
 
 def parseData():
     playerDataList = []
-    for p in playerToParse:
+    playerMap = generatePlayerMap()
+    for p in playerMap.keys():
         gamesPlayed = 0
         totalPoints = 0
         totalWins = 0
@@ -83,23 +92,22 @@ def parseData():
         response = requests.get(url)
         if response.status_code == 200:
             json_data = response.json()
+            for game in json_data:
+                start_time_ms = int(game["startTime"])
+                start_time_seconds = start_time_ms / 1000
+                start_date = datetime.fromtimestamp(start_time_seconds)
+                if start_date.month == current_month:
+                    if not playedWithBots(game["players"]) and game["finished"] and game["setting"]["privateGame"]:
+                        for player in game["players"]:
+                            if p == player["username"] and player["finished"]: 
+                                totalPoints += player["points"]
+                                gamesPlayed+=1
+                                if player["rank"] == 1:
+                                    totalWins += 1
+            playerData = Player(playerMap[p], totalWins, gamesPlayed, totalPoints)
+            playerDataList.append(playerData)
         else:
             print(f"Error: Failed to fetch data from {url}. Status code: {response.status_code}")
-
-        for game in json_data:
-            start_time_ms = int(game["startTime"])
-            start_time_seconds = start_time_ms / 1000
-            start_date = datetime.fromtimestamp(start_time_seconds)
-            if start_date.month == current_month:
-                if not playedWithBots(game["players"]) and game["finished"] and game["setting"]["privateGame"]:
-                    for player in game["players"]:
-                        if p == player["username"] and player["finished"]: 
-                            totalPoints += player["points"]
-                            gamesPlayed+=1
-                            if player["rank"] == 1:
-                                totalWins += 1
-        playerData = Player(playerMap[p], totalWins, gamesPlayed, totalPoints)
-        playerDataList.append(playerData)
     return playerDataList
 
 current_month = datetime.now().month
